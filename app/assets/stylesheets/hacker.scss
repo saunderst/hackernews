@@ -12,29 +12,39 @@ body {
 .top-links {
   margin-top: .5rem;
   background-color: #ff6600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   a:visited {
+    // override normal behaviour so the top links don't change appearance
     color: #000000;
   }
-  b {
-    margin-right: .5rem;
-  }
-  // line-height: 10pt;
+}
+
+#top-left-links {
+  display: flex;
+  align-items: center;
+}
+
+#top-left-links {
+  display: flex;
+  align-items: center;
 }
 
 .Ylogo {
   border: 1px white solid;
-  margin-top: 3px;
-  margin-left: 3px;
+  height: 18px;
+  width: 18px;
+  margin: 2px;
 }
 
 #link-labels {
-  vertical-align: super;
+  margin-left: 1em;
 }
 
 #login-link {
-  float: right;
-  margin-top: 5px;
-  margin-right: 5px;
+ align-self: right; 
+ margin-right: .5em;
 }
 
 .ycombinator-links {

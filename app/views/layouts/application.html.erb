@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>HerokuDeploy</title>
+<head>
+  <title>Hacker News</title>
     <%= csrf_meta_tags %>
 
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-  </head>
-
-  <body>
-    <%= yield %>
-  </body>
+</head>
+<body>
+  <div>
+    <%= render 'layouts/top_nav' %>
+    <main class="container">
+      <%= yield %>
+    </main>
+    <%= render 'layouts/bottom_nav' %>
+  </div>
+</body>
 </html>

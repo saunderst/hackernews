@@ -4,6 +4,7 @@ const TOP_STORIES_URL = "https://hacker-news.firebaseio.com/v0/topstories.json";
 const ONE_PAGE = 30;
 let globalArticleIndex = 0;  // track where we are in the list of articles as pages are loaded
 let globalArticleList = [];  // fetch this once at the beginning
+let globalTotalArticles = 0;
 
 readJSONFile = (path, data) => {
   return new Promise((resolve, reject) => {
@@ -26,7 +27,7 @@ readJSONFile = (path, data) => {
 articleToHackerHTML = (seq, article) => {
   let site = article.url ? (new URL(article.url)).hostname.replace("www.","") : null;
   return (
-    `<span class="article-num">${seq}. </span>` +
+    `<span class="article-num">${seq + 1}. </span>` +
     `<a href="${article.url}" class="article-title">${article.title}</a>` +
     (site ? `<span class="article-site"> (<a href="https://news.ycombinator.com/from?site=${site}">${site})</a></span>` : "") +
     `<br><span class="article-num"> </span>` +
@@ -39,17 +40,6 @@ articleToHackerHTML = (seq, article) => {
   );
 }
 
-document.addEventListener("DOMContentLoaded", event => { 
-  // This tag lets us know that we're in the right place to do all this stuff.
-  if (document.getElementById("hacker-index")) {
-    moment.relativeTimeRounding(Math.floor);    // The original Hacker News seems to round relative times down, and so shall we.
-    readJSONFile(TOP_STORIES_URL).then((articleList) => {
-      globalArticleList = articleList;
-      renderHackerNewsPage();    
-    });
-  }
-});
-
 renderHackerNewsPage = () => {
   let JSONPromises = [];
   for (let articleIndex = globalArticleIndex ; articleIndex < globalArticleIndex + ONE_PAGE; ++articleIndex) {
@@ -57,10 +47,11 @@ renderHackerNewsPage = () => {
   }
   Promise.all(JSONPromises).then((articleList) => {
     let newsPageHTML = "";
-    for (let articleIndex = 0; articleIndex < ONE_PAGE; ++articleIndex) {
-      newsPageHTML += articleToHackerHTML(articleIndex + 1, articleList[articleIndex]);
+    for (let articleIndex = 0 ; articleIndex < ONE_PAGE; ++articleIndex) {
+      newsPageHTML += articleToHackerHTML(articleIndex + globalArticleIndex, articleList[articleIndex]);
     }
     let newsPageElement = document.getElementById("news-page"); // Here's where we insert articles for display.
+
     // if this is the first time we're doing this, remove any placeholder content from the page
     if (globalArticleIndex === 0) {
       while (newsPageElement.childNodes.length > 0) {
@@ -69,15 +60,48 @@ renderHackerNewsPage = () => {
     }
     newsPageElement.insertAdjacentHTML("beforeend", newsPageHTML);
     globalArticleIndex += ONE_PAGE;
+  }).catch(err => {
+    // Errors encountered in testing have been transient.
+    // Just them for now.
+    console.log(err);
   });
-
 }
 
-// var elem  = document.getElementById("ff");
-// window.addEventListener('scroll', fixit);
-// function fixit() {
-//   let diff = elem.getBoundingClientRect().bottom - document.documentElement.clientHeight;
-//     if (diff <= 0) {
-//       elem.style.position="fixed";
-//     }
-// }
+let debounce_timer;
+window.addEventListener('scroll', () => {
+  if(debounce_timer) {
+    window.clearTimeout(debounce_timer);
+  }
+  debounce_timer = window.setTimeout(() => {
+    getMoreArticles();            
+  }, 100);
+});
+
+function getMoreArticles() {
+  // some things we want to do if we've scrolled to the bottom
+  let pageBottom = document.getElementById("news-page").getBoundingClientRect().bottom
+  let diff = pageBottom - document.documentElement.clientHeight;
+    // if we're on the first page, wait to get very close so the footer won't jump when we fix it
+    // after the first page, be generous with the pre-fetching
+  let footMenu = document.getElementById("bottom-element");
+  if (footMenu.style.position === "fixed") {
+    if (diff <= 200) {
+      renderHackerNewsPage();
+    }
+  } else if (diff <= 10) {
+    footMenu.style.position="fixed";
+    footMenu.style.width="85%";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", event => { 
+  // This tag lets us know that we're in the right place to do all this stuff.
+  if (document.getElementById("hacker-index")) {
+    moment.relativeTimeRounding(Math.floor);    // The original Hacker News seems to round relative times down, and so shall we.
+    readJSONFile(TOP_STORIES_URL).then((articleList) => {
+      globalArticleList = articleList;
+      globalTotalArticles = articleList.length;
+      renderHackerNewsPage(); 
+    });
+  }
+});

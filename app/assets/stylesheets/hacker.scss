@@ -82,6 +82,12 @@ body {
   padding-bottom: 2rem;
 }
 
+#bottom-element {
+  // position: fixed;
+  // width: 85%;
+  bottom: 0;
+}
+
 a:link    { color:#000000; text-decoration:none; }
 a:visited { color:#828282; text-decoration:none; }
 

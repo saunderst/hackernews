@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.min.js"></script>
   <title>Hacker News</title>
-    <%= csrf_meta_tags %>
+  <%= csrf_meta_tags %>
 
-    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
 </head>
-<body>
+<body id="<%= controller_name %>-<%= action_name %>">  <!-- This tag is to let javascript code know which page we're on. -->
   <div>
     <%= render 'layouts/top_nav' %>
     <main class="container">

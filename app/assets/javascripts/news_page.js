@@ -42,12 +42,12 @@ articleToHackerHTML = (seq, article) => {
 
 renderHackerNewsPage = () => {
   let JSONPromises = [];
-  for (let articleIndex = globalArticleIndex ; articleIndex < globalArticleIndex + ONE_PAGE; ++articleIndex) {
+  for (let articleIndex = globalArticleIndex ; articleIndex < Math.min(globalArticleIndex + ONE_PAGE, globalTotalArticles); ++articleIndex) {
     JSONPromises.push(readJSONFile(`https://hacker-news.firebaseio.com/v0/item/${globalArticleList[articleIndex]}.json`));
   }
   Promise.all(JSONPromises).then((articleList) => {
     let newsPageHTML = "";
-    for (let articleIndex = 0 ; articleIndex < ONE_PAGE; ++articleIndex) {
+    for (let articleIndex = 0 ; articleIndex < articleList.length; ++articleIndex) {
       newsPageHTML += articleToHackerHTML(articleIndex + globalArticleIndex, articleList[articleIndex]);
     }
     let newsPageElement = document.getElementById("news-page"); // Here's where we insert articles for display.
